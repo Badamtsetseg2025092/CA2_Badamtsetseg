@@ -13,7 +13,60 @@ import java.util.*;
  * @author badamtsetsegnatsagdorj
  */
 public class CA2_Badamtsetseg {
+private static final Scanner SCANNER = new Scanner(System.in);
 
+    // Main list of employees loaded from file + additions
+    private static final List<Employee> employees = new ArrayList<>();
+
+    // Track newly added employees in this session
+    private static final List<Employee> newlyAddedEmployees = new ArrayList<>();
+
+    // Comparator for sorting/searching (alphabetical by full name: "First Last")
+    private static final Comparator<Employee> NAME_COMPARATOR =
+            Comparator.comparing(Employee::getFullName, String.CASE_INSENSITIVE_ORDER);
+
+    public static void main(String[] args) {
+
+    boolean loaded = false;
+
+    // KEEP ASKING until file is successfully read
+    while (!loaded) {
+        System.out.print("Please enter the filename to read: ");
+        String fileName = SCANNER.nextLine().trim();
+
+        loaded = loadEmployeesFromFile(fileName);
+
+        if (!loaded) {
+            System.out.println("Error: Could not read file.");
+            System.out.println("Please try again.\n");
+        }
+    }
+
+    System.out.println("File read successfully\n");
+
+    boolean running = true;
+    while (running) {
+        MenuOption choice = readMenuChoice();
+        switch (choice) {
+            case SORT:
+                handleSort();
+                break;
+            case SEARCH:
+                handleSearch();
+                break;
+            case ADD_RECORDS:
+                handleAddRecord();
+                break;
+            case CREATE_BINARY_TREE:
+                handleCreateBinaryTree();
+                break;
+            case EXIT:
+                System.out.println("Exiting program. Goodbye!");
+                running = false;
+                break;
+        }
+    }
+}
   
 class Manager {
    
