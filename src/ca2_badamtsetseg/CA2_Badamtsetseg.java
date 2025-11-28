@@ -67,7 +67,61 @@ private static final Scanner SCANNER = new Scanner(System.in);
         }
     }
 }
-  
+  // main menu
+
+    private static MenuOption readMenuChoice() {
+        while (true) {
+            System.out.println("Please choose one of following options!");
+            for (MenuOption option : MenuOption.values()) {
+                System.out.printf("%d. %s%n", option.getCode(), option.getLabel());
+            }
+            System.out.print("Enter your choice: ");
+            String input = SCANNER.nextLine().trim();
+            try {
+                int code = Integer.parseInt(input);
+                MenuOption option = MenuOption.fromCode(code);
+                if (option != null) {
+                    System.out.println();
+                    System.out.println(option.getLabel() + " selected");
+                    System.out.println();
+                    return option;
+                } else {
+                    System.out.println("Invalid option number. Please try again.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    } 
+    // file reader
+
+    private static boolean loadEmployeesFromFile(String fileName) {
+    employees.clear();
+    newlyAddedEmployees.clear();
+
+    try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        String line;
+        boolean firstLine = true;
+
+        while ((line = br.readLine()) != null) {
+            if (firstLine) {
+                firstLine = false;
+                continue;
+            }
+            if (line.trim().isEmpty()) continue;
+
+            Employee e = parseEmployee(line);
+            if (e != null) {
+                employees.add(e);
+            }
+        }
+        return true; // success!
+
+    } catch (IOException e) {
+        return false; // failed to read file
+    }
+}
+   
 class Manager {
    
     private final ManagerType managerType;
