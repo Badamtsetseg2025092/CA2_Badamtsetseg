@@ -61,7 +61,7 @@ private static final Scanner SCANNER = new Scanner(System.in);
                 handleCreateBinaryTree();
                 break;
             case EXIT:
-                System.out.println("Exiting program. Goodbye!");
+                System.out.println("Exiting program. Thank you!");
                 running = false;
                 break;
         }
@@ -121,6 +121,112 @@ private static final Scanner SCANNER = new Scanner(System.in);
         return false; // failed to read file
     }
 }
+    // Parses one CSV line into an Employee
+    private static Employee parseEmployee(String line) {
+        // Very simple CSV split; your dummy data has no embedded commas
+        String[] parts = line.split(",");
+        if (parts.length < 9) {
+            System.out.println("Skipping malformed line: " + line);
+            return null;
+        }
+
+        String firstName = parts[0].trim();
+        String lastName = parts[1].trim();
+        String gender = parts[2].trim();
+        String email = parts[3].trim();
+        double salary;
+        try {
+            salary = Double.parseDouble(parts[4].trim());
+        } catch (NumberFormatException ex) {
+            salary = 0.0;
+        }
+        String deptRaw = parts[5].trim();
+        String positionRaw = parts[6].trim();
+        String jobTitle = parts[7].trim();
+        String company = parts[8].trim();
+
+        DepartmentName deptName = DepartmentName.fromString(deptRaw);
+        Department department = new Department(deptName);
+
+        ManagerType managerType = ManagerType.fromStrings(positionRaw, jobTitle);
+
+        // Manager object not heavily used here, but created to satisfy class structure
+        Manager manager = new Manager(managerType, department);
+
+        return new Employee(firstName, lastName, gender, email, salary,
+                department, manager, jobTitle, company);
+    }
+    // ========== SORTING (MERGE SORT, RECURSIVE) ==========
+
+    private static void handleSort() {
+        if (employees.isEmpty()) {
+            System.out.println("No employees loaded.");
+            return;
+        }
+
+        // We use a recursive Merge Sort here.
+        // Justification (high level, not algorithm definition):
+        // - It has predictable performance on all inputs (no worst-case degradation).
+        // - It is naturally recursive, which matches the requirement.
+        // - It handles large lists reliably and is stable (keeps equal names in order).
+        System.out.println("Sorting employees by full name (alphabetical) using recursive Merge Sort...");
+        mergeSort(employees, NAME_COMPARATOR);
+
+        System.out.println("First 20 names (or fewer if list is smaller):");
+        for (int i = 0; i < employees.size() && i < 20; i++) {
+            Employee e = employees.get(i);
+            System.out.printf("%2d. %s%n", i + 1, e.getFullName());
+        }
+        System.out.println();
+    }
+
+    private static void mergeSort(List<Employee> list, Comparator<Employee> comparator) {
+        if (list.size() <= 1) {
+            return;
+        }
+        Employee[] arr = list.toArray(new Employee[0]);
+        mergeSort(arr, 0, arr.length - 1, comparator);
+        list.clear();
+        list.addAll(Arrays.asList(arr));
+    }
+
+    private static void mergeSort(Employee[] arr, int left, int right, Comparator<Employee> cmp) {
+        if (left >= right) {
+            return;
+        }
+        int mid = left + (right - left) / 2;
+        mergeSort(arr, left, mid, cmp);
+        mergeSort(arr, mid + 1, right, cmp);
+        merge(arr, left, mid, right, cmp);
+    }
+
+    private static void merge(Employee[] arr, int left, int mid, int right, Comparator<Employee> cmp) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        Employee[] L = new Employee[n1];
+        Employee[] R = new Employee[n2];
+
+        System.arraycopy(arr, left, L, 0, n1);
+        System.arraycopy(arr, mid + 1, R, 0, n2);
+
+        int i = 0, j = 0;
+        int k = left;
+
+        while (i < n1 && j < n2) {
+            if (cmp.compare(L[i], R[j]) <= 0) {
+                arr[k++] = L[i++];
+            } else {
+                arr[k++] = R[j++];
+            }
+        }
+        while (i < n1) {
+            arr[k++] = L[i++];
+        }
+        while (j < n2) {
+            arr[k++] = R[j++];
+        }
+    }
    
 class Manager {
    
