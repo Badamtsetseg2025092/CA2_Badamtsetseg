@@ -227,6 +227,92 @@ private static final Scanner SCANNER = new Scanner(System.in);
             arr[k++] = R[j++];
         }
     }
+    private static void mergeSort(List<Employee> list, Comparator<Employee> comparator) {
+        if (list.size() <= 1) {
+            return;
+        }
+        Employee[] arr = list.toArray(new Employee[0]);
+        mergeSort(arr, 0, arr.length - 1, comparator);
+        list.clear();
+        list.addAll(Arrays.asList(arr));
+    }
+
+    private static void mergeSort(Employee[] arr, int left, int right, Comparator<Employee> cmp) {
+        if (left >= right) {
+            return;
+        }
+        int mid = left + (right - left) / 2;
+        mergeSort(arr, left, mid, cmp);
+        mergeSort(arr, mid + 1, right, cmp);
+        merge(arr, left, mid, right, cmp);
+    }
+
+    private static void merge(Employee[] arr, int left, int mid, int right, Comparator<Employee> cmp) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        Employee[] L = new Employee[n1];
+        Employee[] R = new Employee[n2];
+
+        System.arraycopy(arr, left, L, 0, n1);
+        System.arraycopy(arr, mid + 1, R, 0, n2);
+
+        int i = 0, j = 0;
+        int k = left;
+
+        while (i < n1 && j < n2) {
+            if (cmp.compare(L[i], R[j]) <= 0) {
+                arr[k++] = L[i++];
+            } else {
+                arr[k++] = R[j++];
+            }
+        }
+        while (i < n1) {
+            arr[k++] = L[i++];
+        }
+        while (j < n2) {
+            arr[k++] = R[j++];
+        }
+    }
+
+    // search employee data
+
+    private static void handleSearch() {
+        if (employees.isEmpty()) {
+            System.out.println("No employees loaded.");
+            return;
+        }
+
+        // Ensure list is sorted before binary search
+        mergeSort(employees, NAME_COMPARATOR);
+
+        System.out.print("Enter full name to search (e.g: John Smith): ");
+        String query = SCANNER.nextLine().trim();
+
+        // We use Binary Search on the sorted list here.
+        // Justification (high level):
+        // - It is very efficient on sorted lists (logarithmic time).
+        // - It greatly reduces the number of comparisons versus a linear scan.
+        // - It matches naturally with our sorted structure.
+        int index = binarySearchByFullName(employees, query);
+
+        if (index >= 0) {
+            Employee e = employees.get(index);
+            System.out.println("Record found:");
+            System.out.println("Full Name    : " + e.getFullName());
+            System.out.println("Email        : " + e.getEmail());
+            System.out.println("Gender       : " + e.getGender());
+            System.out.println("Salary       : " + e.getSalary());
+            System.out.println("Company      : " + e.getCompany());
+            System.out.println("Department   : " + e.getDepartment().getName());
+            System.out.println("Manager Type : " + e.getManager().getManagerType());
+            System.out.println("Job Title    : " + e.getJobTitle());
+            System.out.println();
+        } else {
+            System.out.println("No record found for: " + query);
+            System.out.println();
+        }
+    }
    
 class Manager {
    
