@@ -487,7 +487,67 @@ while (true) {
         System.out.println();
     }
 }
-    
+ // ========== ENUMS ==========
+
+enum MenuOption {
+    SORT(1, "Sort"),
+    SEARCH(2, "Search"),
+    ADD_RECORDS(3, "Add records"),
+    CREATE_BINARY_TREE(4, "Create a binary tree"),
+    EXIT(5, "Exit program");
+
+    private final int code;
+    private final String label;
+
+    MenuOption(int code, String label) {
+        this.code = code;
+        this.label = label;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public static MenuOption fromCode(int code) {
+        for (MenuOption option : values()) {
+            if (option.code == code) {
+                return option;
+            }
+        }
+        return null;
+    }
+}
+
+enum DepartmentName {
+    IT_DEVELOPMENT,
+    HR,
+    FINANCE,
+    MARKETING,
+    SALES,
+    CUSTOMER_SERVICE,
+    ACCOUNTING,
+    OTHER;
+
+    public static DepartmentName fromString(String raw) {
+        if (raw == null || raw.trim().isEmpty()) {
+            return OTHER;
+        }
+        String s = raw.trim().toLowerCase();
+        if (s.contains("it")) return IT_DEVELOPMENT;
+        if (s.contains("hr")) return HR;
+        if (s.contains("finance")) return FINANCE;
+        if (s.contains("market")) return MARKETING;
+        if (s.contains("sale")) return SALES;
+        if (s.contains("customer")) return CUSTOMER_SERVICE;
+        if (s.contains("account")) return ACCOUNTING;
+        return OTHER;
+    }
+}
+
 class Manager {
    
     private final ManagerType managerType;
