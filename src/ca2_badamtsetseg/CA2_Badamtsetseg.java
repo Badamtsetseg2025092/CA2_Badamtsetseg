@@ -313,7 +313,111 @@ private static final Scanner SCANNER = new Scanner(System.in);
             System.out.println();
         }
     }
-   
+   private static int binarySearchByFullName(List<Employee> list, String targetName) {
+        int left = 0;
+        int right = list.size() - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            Employee midEmp = list.get(mid);
+            int cmp = midEmp.getFullName().compareToIgnoreCase(targetName);
+            if (cmp == 0) {
+                return mid;
+            } else if (cmp < 0) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return -1;
+    }
+
+    // add new records
+
+    private static void handleAddRecord() {
+        System.out.println("Add a new employee record.");
+        System.out.print("First name: ");
+        String firstName = readNonEmptyString();
+
+        System.out.print("Last name: ");
+        String lastName = readNonEmptyString();
+
+        String gender = "";
+while (true) {
+    System.out.println("Select Gender:");
+    System.out.println("1. Female");
+    System.out.println("2. Male");
+    
+
+    String gInput = SCANNER.nextLine().trim();
+
+    if (gInput.equals("1")) {
+        gender = "Female";
+        break;
+    } else if (gInput.equals("2")) {
+        gender = "Male";
+        break;
+    } else {
+        System.out.println("Invalid choice! Please enter 1 or 2.\n");
+    }
+}
+
+        System.out.print("Email: ");
+        String email = readNonEmptyString();
+
+        double salary = readDoubleWithPrompt("Salary: ");
+
+        DepartmentName deptName = readDepartmentFromUser();
+        Department department = new Department(deptName);
+
+        ManagerType managerType = readManagerTypeFromUser();
+        Manager manager = new Manager(managerType, department);
+
+        System.out.print("Job Title: ");
+        String jobTitle = readNonEmptyString();
+
+        System.out.print("Company: ");
+        String company = readNonEmptyString();
+
+        Employee newEmp = new Employee(firstName, lastName, gender, email, salary,
+                department, manager, jobTitle, company);
+
+        employees.add(newEmp);
+        newlyAddedEmployees.add(newEmp);
+
+        // After insertion, keep list sorted for consistency
+        mergeSort(employees, NAME_COMPARATOR);
+
+        System.out.println("New employee added successfully.");
+        System.out.println("Newly added records this session:");
+        for (Employee e : newlyAddedEmployees) {
+            System.out.println(" - " + e);
+        }
+        System.out.println();
+    }
+
+    private static String readNonEmptyString() {
+        while (true) {
+            String input = SCANNER.nextLine().trim();
+            if (!input.isEmpty()) {
+                return input;
+            }
+            System.out.print("Input cannot be empty. Try again: ");
+        }
+    }
+
+    private static double readDoubleWithPrompt(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = SCANNER.nextLine().trim();
+            try {
+                return Double.parseDouble(input);
+            } catch (NumberFormatException ex) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+    
 class Manager {
    
     private final ManagerType managerType;
