@@ -332,7 +332,7 @@ private static final Scanner SCANNER = new Scanner(System.in);
         return -1;
     }
 
-    // add new records
+    // add new records                   
 
     private static void handleAddRecord() {
         System.out.println("Add a new employee record.");
@@ -416,7 +416,77 @@ while (true) {
                 System.out.println("Please enter a valid number.");
             }
         }
+    } 
+    
+    private static DepartmentName readDepartmentFromUser() {
+        while (true) {
+            System.out.println("Choose a Department:");
+            DepartmentName[] values = DepartmentName.values();
+            for (int i = 0; i < values.length; i++) {
+                System.out.printf("%d. %s%n", i + 1, values[i]);
+            }
+            System.out.print("Enter option: ");
+            String input = SCANNER.nextLine().trim();
+            try {
+                int idx = Integer.parseInt(input);
+                if (idx >= 1 && idx <= values.length) {
+                    return values[idx - 1];
+                }
+            } catch (NumberFormatException ignored) {}
+            System.out.println("Invalid department choice. Try again.");
+        }
     }
+
+    private static ManagerType readManagerTypeFromUser() {
+        while (true) {
+            System.out.println("Choose a Manager Type:");
+            ManagerType[] values = ManagerType.values();
+            for (int i = 0; i < values.length; i++) {
+                System.out.printf("%d. %s%n", i + 1, values[i]);
+            }
+            System.out.print("Enter option: ");
+            String input = SCANNER.nextLine().trim();
+            try {
+                int idx = Integer.parseInt(input);
+                if (idx >= 1 && idx <= values.length) {
+                    return values[idx - 1];
+                }
+            } catch (NumberFormatException ignored) {}
+            System.out.println("Invalid manager type choice. Try again.");
+        }
+    }
+
+    // binary tree
+
+    private static void handleCreateBinaryTree() {
+        if (employees.size() < 28) {
+            System.out.println("Not enough employee records to build the tree.");
+            System.out.println("You currently have " + employees.size() + " records; need at least 28.");
+            System.out.println();
+            return;
+        }
+
+        // Build a simple complete binary tree using level-order insertion
+        EmployeeBinaryTree tree = new EmployeeBinaryTree();
+
+        // Insert the first 20 employees. You can change this to employees.size() if desired.
+        int count = Math.min(28, employees.size());
+        System.out.println("Creating employee hierarchy binary tree with " + count + " records...");
+        for (int i = 0; i < count; i++) {
+            tree.insert(employees.get(i));
+        }
+
+        System.out.println("Level-order traversal of hierarchy:");
+        tree.printLevelOrder();
+        System.out.println();
+
+        int height = tree.height();
+        int nodeCount = tree.countNodes();
+        System.out.println("Tree height     : " + height);
+        System.out.println("Total node count: " + nodeCount);
+        System.out.println();
+    }
+}
     
 class Manager {
    
