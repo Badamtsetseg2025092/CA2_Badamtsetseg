@@ -306,7 +306,6 @@ private static final Scanner SCANNER = new Scanner(System.in);
             System.out.println("Company      : " + e.getCompany());
             System.out.println("Department   : " + e.getDepartment().getName());
             System.out.println("Manager Type : " + e.getManager().getManagerType());
-            System.out.println("Job Title    : " + e.getJobTitle());
             System.out.println();
         } else {
             System.out.println("No record found for: " + query);
@@ -546,6 +545,62 @@ enum DepartmentName {
         if (s.contains("account")) return ACCOUNTING;
         return OTHER;
     }
+} 
+
+enum ManagerType {
+    INTERN,
+    SENIOR,
+    CONTRACT,
+    MANAGER,
+    SENIOR_MANAGER,
+    TEAM_LEADER,
+    HEAD_MANAGER,
+    ASSISTANT_MANAGER,
+    OTHER;
+
+    public static ManagerType fromStrings(String position, String jobTitle) {
+        String pos = position == null ? "" : position.trim().toLowerCase();
+        String title = jobTitle == null ? "" : jobTitle.trim().toLowerCase();
+
+        // First check explicit position field
+        switch (pos) {
+            case "intern":
+                return INTERN;
+            case "senior":
+                return SENIOR;
+            case "contract":
+                return CONTRACT;
+        }
+
+        // Then infer from job title
+        if (title.contains("head manager")) return HEAD_MANAGER;
+        if (title.contains("senior manager")) return SENIOR_MANAGER;
+        if (title.contains("team lead")) return TEAM_LEADER;
+        if (title.contains("assistant manager")) return ASSISTANT_MANAGER;
+        if (title.contains("manager")) return MANAGER;
+
+        // Fall back
+        return OTHER;
+    }
+}
+
+// ========== CORE CLASSES: Department, Manager, Employee ==========
+
+class Department {
+    private final DepartmentName name;
+
+    public Department(DepartmentName name) {
+        this.name = name;
+    }
+
+    public DepartmentName getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return name.toString();
+    }
 }
 
 class Manager {
@@ -569,23 +624,6 @@ class Manager {
     @Override
     public String toString() {
         return managerType + " in " + department;
-    }
-}
-
-class Department {
-    private final DepartmentName name;
-
-    public Department(DepartmentName name) {
-        this.name = name;
-    }
-
-    public DepartmentName getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name.toString();
     }
 }
 
@@ -732,5 +770,4 @@ class EmployeeBinaryTree {
         int rh = height(node.right);
         return 1 + Math.max(lh, rh);
     }
-}   
-}
+} 
