@@ -3,17 +3,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 package ca2_badamtsetseg;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*; 
+import java.util.*;
+import static ca2_badamtsetseg.MenuOption.values;
+
 /**
- *
- * @author badamtsetsegnatsagdorj
+ * Main application class
  */
 public class CA2_Badamtsetseg {
-private static final Scanner SCANNER = new Scanner(System.in);
+
+    private static final Scanner SCANNER = new Scanner(System.in);
 
     // Main list of employees loaded from file + additions
     private static final List<Employee> employees = new ArrayList<>();
@@ -29,12 +30,12 @@ private static final Scanner SCANNER = new Scanner(System.in);
 
     boolean loaded = false;
 
-    // KEEP ASKING until file is successfully read
+    // loop until file is successfully read
     while (!loaded) {
-        System.out.print("Please enter the filename to read: ");
+        System.out.print("Please enter the filename to read: "); 
         String fileName = SCANNER.nextLine().trim();
 
-        loaded = loadEmployeesFromFile(fileName);
+        loaded = loadEmployeesFromFile(fileName); // try to load file
 
         if (!loaded) {
             System.out.println("Error: Could not read file.");
@@ -44,39 +45,40 @@ private static final Scanner SCANNER = new Scanner(System.in);
 
     System.out.println("File read successfully\n");
 
-    boolean running = true;
+    boolean running = true; // loop control for menu 
     while (running) {
-        MenuOption choice = readMenuChoice();
+        MenuOption choice = readMenuChoice(); // read user menu input
         switch (choice) {
             case SORT:
-                handleSort();
+                handleSort(); // sort employees
                 break;
             case SEARCH:
-                handleSearch();
+                handleSearch(); // search employee
                 break;
             case ADD_RECORDS:
-                handleAddRecord();
+                handleAddRecord(); // add new employee
                 break;
             case CREATE_BINARY_TREE:
-                handleCreateBinaryTree();
+                handleCreateBinaryTree(); // create tree
                 break;
             case EXIT:
-                System.out.println("Exiting program. Thank you!");
-                running = false;
+                System.out.println("Exiting program. Thank  you!");
+                running = false; // stop loop
                 break;
         }
     }
 }
-  // main menu
+
+    // read menu choice from user
 
     private static MenuOption readMenuChoice() {
         while (true) {
             System.out.println("Please choose one of following options!");
             for (MenuOption option : MenuOption.values()) {
-                System.out.printf("%d. %s%n", option.getCode(), option.getLabel());
+                System.out.printf("%d. %s%n", option.getCode(), option.getLabel()); // print menu
             }
             System.out.print("Enter your choice: ");
-            String input = SCANNER.nextLine().trim();
+            String input = SCANNER.nextLine().trim(); // get input from the user and get rid of space
             try {
                 int code = Integer.parseInt(input);
                 MenuOption option = MenuOption.fromCode(code);
@@ -92,8 +94,9 @@ private static final Scanner SCANNER = new Scanner(System.in);
                 System.out.println("Please enter a valid number.");
             }
         }
-    } 
-    // file reader
+    }
+
+    // read data from file
 
     private static boolean loadEmployeesFromFile(String fileName) {
     employees.clear();
@@ -121,6 +124,7 @@ private static final Scanner SCANNER = new Scanner(System.in);
         return false; // failed to read file
     }
 }
+
     // Parses one CSV line into an Employee
     private static Employee parseEmployee(String line) {
         // Very simple CSV split; your dummy data has no embedded commas
@@ -156,7 +160,8 @@ private static final Scanner SCANNER = new Scanner(System.in);
         return new Employee(firstName, lastName, gender, email, salary,
                 department, manager, jobTitle, company);
     }
-    // ========== SORTING (MERGE SORT, RECURSIVE) ==========
+
+    // sorting algorithm(merge sort) 
 
     private static void handleSort() {
         if (employees.isEmpty()) {
@@ -169,11 +174,11 @@ private static final Scanner SCANNER = new Scanner(System.in);
         // - It has predictable performance on all inputs (no worst-case degradation).
         // - It is naturally recursive, which matches the requirement.
         // - It handles large lists reliably and is stable (keeps equal names in order).
-        System.out.println("Sorting employees by full name (alphabetical) using recursive Merge Sort...");
+        System.out.println("Sorting employees by full name (alphabetical) using Merge Sort...");
         mergeSort(employees, NAME_COMPARATOR);
 
-        System.out.println("First 20 names (or fewer if list is smaller):");
-        for (int i = 0; i < employees.size() && i < 20; i++) {
+        System.out.println("First 30 names (or fewer if list is smaller):");
+        for (int i = 0; i < employees.size() && i < 30; i++) {
             Employee e = employees.get(i);
             System.out.printf("%2d. %s%n", i + 1, e.getFullName());
         }
@@ -227,55 +232,8 @@ private static final Scanner SCANNER = new Scanner(System.in);
             arr[k++] = R[j++];
         }
     }
-    private static void mergeSort(List<Employee> list, Comparator<Employee> comparator) {
-        if (list.size() <= 1) {
-            return;
-        }
-        Employee[] arr = list.toArray(new Employee[0]);
-        mergeSort(arr, 0, arr.length - 1, comparator);
-        list.clear();
-        list.addAll(Arrays.asList(arr));
-    }
 
-    private static void mergeSort(Employee[] arr, int left, int right, Comparator<Employee> cmp) {
-        if (left >= right) {
-            return;
-        }
-        int mid = left + (right - left) / 2;
-        mergeSort(arr, left, mid, cmp);
-        mergeSort(arr, mid + 1, right, cmp);
-        merge(arr, left, mid, right, cmp);
-    }
-
-    private static void merge(Employee[] arr, int left, int mid, int right, Comparator<Employee> cmp) {
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
-
-        Employee[] L = new Employee[n1];
-        Employee[] R = new Employee[n2];
-
-        System.arraycopy(arr, left, L, 0, n1);
-        System.arraycopy(arr, mid + 1, R, 0, n2);
-
-        int i = 0, j = 0;
-        int k = left;
-
-        while (i < n1 && j < n2) {
-            if (cmp.compare(L[i], R[j]) <= 0) {
-                arr[k++] = L[i++];
-            } else {
-                arr[k++] = R[j++];
-            }
-        }
-        while (i < n1) {
-            arr[k++] = L[i++];
-        }
-        while (j < n2) {
-            arr[k++] = R[j++];
-        }
-    }
-
-    // search employee data
+    // searching employee
 
     private static void handleSearch() {
         if (employees.isEmpty()) {
@@ -306,13 +264,15 @@ private static final Scanner SCANNER = new Scanner(System.in);
             System.out.println("Company      : " + e.getCompany());
             System.out.println("Department   : " + e.getDepartment().getName());
             System.out.println("Manager Type : " + e.getManager().getManagerType());
+            System.out.println("Job Title    : " + e.getJobTitle());
             System.out.println();
         } else {
             System.out.println("No record found for: " + query);
             System.out.println();
         }
     }
-   private static int binarySearchByFullName(List<Employee> list, String targetName) {
+
+    private static int binarySearchByFullName(List<Employee> list, String targetName) {
         int left = 0;
         int right = list.size() - 1;
 
@@ -331,7 +291,7 @@ private static final Scanner SCANNER = new Scanner(System.in);
         return -1;
     }
 
-    // add new records                   
+    // add new records 
 
     private static void handleAddRecord() {
         System.out.println("Add a new employee record.");
@@ -415,8 +375,8 @@ while (true) {
                 System.out.println("Please enter a valid number.");
             }
         }
-    } 
-    
+    }
+
     private static DepartmentName readDepartmentFromUser() {
         while (true) {
             System.out.println("Choose a Department:");
@@ -455,7 +415,7 @@ while (true) {
         }
     }
 
-    // binary tree
+    // Binary tree 
 
     private static void handleCreateBinaryTree() {
         if (employees.size() < 28) {
@@ -486,7 +446,8 @@ while (true) {
         System.out.println();
     }
 }
- // ========== ENUMS ==========
+
+// code for enums
 
 enum MenuOption {
     SORT(1, "Sort"),
@@ -545,7 +506,7 @@ enum DepartmentName {
         if (s.contains("account")) return ACCOUNTING;
         return OTHER;
     }
-} 
+}
 
 enum ManagerType {
     INTERN,
@@ -584,7 +545,7 @@ enum ManagerType {
     }
 }
 
-// ========== CORE CLASSES: Department, Manager, Employee ==========
+// code for core classes
 
 class Department {
     private final DepartmentName name;
@@ -604,7 +565,6 @@ class Department {
 }
 
 class Manager {
-   
     private final ManagerType managerType;
     private final Department department;
 
@@ -630,10 +590,12 @@ class Manager {
 class Employee {
     private final String firstName;
     private final String lastName;
+    private final String gender;
     private final String email;
     private final double salary;
     private final Department department;
     private final Manager manager;
+    private final String jobTitle;
     private final String company;
 
     public Employee(String firstName, String lastName, String gender, String email,
@@ -641,10 +603,12 @@ class Employee {
                     String jobTitle, String company) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.gender = gender;
         this.email = email;
         this.salary = salary;
         this.department = department;
         this.manager = manager;
+        this.jobTitle = jobTitle;
         this.company = company;
     }
 
@@ -652,7 +616,9 @@ class Employee {
         return firstName + " " + lastName;
     }
 
-    
+    public String getGender() {
+        return gender;
+    }
 
     public String getEmail() {
         return email;
@@ -670,6 +636,10 @@ class Employee {
         return manager;
     }
 
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
     public String getCompany() {
         return company;
     }
@@ -678,6 +648,7 @@ class Employee {
     public String toString() {
         return String.format("%s (%s, %s, %s, %s, %.2f)",
                 getFullName(),
+                gender,
                 email,
                 department,
                 manager.getManagerType(),
@@ -685,7 +656,7 @@ class Employee {
     }
 }
 
-//Binary tree 
+// binary tree implementation
 
 class EmployeeBinaryTree {
     private static class Node {
@@ -735,7 +706,7 @@ class EmployeeBinaryTree {
         Queue<Node> queue = new LinkedList<>();
         queue.add(root);
 
-        int level = 0;
+        int level = 1;
         while (!queue.isEmpty()) {
             int size = queue.size();
             System.out.println("Level " + level + ":");
@@ -770,4 +741,4 @@ class EmployeeBinaryTree {
         int rh = height(node.right);
         return 1 + Math.max(lh, rh);
     }
-} 
+}
