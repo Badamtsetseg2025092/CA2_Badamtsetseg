@@ -80,13 +80,13 @@ public class CA2_Badamtsetseg {
             System.out.print("Enter your choice: ");
             String input = SCANNER.nextLine().trim(); // get input from the user and get rid of space
             try {
-                int code = Integer.parseInt(input);
-                MenuOption option = MenuOption.fromCode(code);
+                int code = Integer.parseInt(input); // convert to number
+                MenuOption option = MenuOption.fromCode(code); // find matching option
                 if (option != null) {
                     System.out.println();
                     System.out.println(option.getLabel() + " selected");
                     System.out.println();
-                    return option;
+                    return option; // return valid option
                 } else {
                     System.out.println("Invalid option number. Please try again.");
                 }
@@ -99,21 +99,21 @@ public class CA2_Badamtsetseg {
     // read data from file
 
     private static boolean loadEmployeesFromFile(String fileName) {
-    employees.clear();
-    newlyAddedEmployees.clear();
+    employees.clear(); // clear old data
+    newlyAddedEmployees.clear(); // clear new employees list
 
     try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
         String line;
-        boolean firstLine = true;
+        boolean firstLine = true; // skip header
 
         while ((line = br.readLine()) != null) {
-            if (firstLine) {
+            if (firstLine) { // skip first line
                 firstLine = false;
                 continue;
             }
-            if (line.trim().isEmpty()) continue;
+            if (line.trim().isEmpty()) continue; // skip empty lines
 
-            Employee e = parseEmployee(line);
+            Employee e = parseEmployee(line); // convert line to employee
             if (e != null) {
                 employees.add(e);
             }
@@ -127,11 +127,11 @@ public class CA2_Badamtsetseg {
 
     // Parses one CSV line into an Employee
     private static Employee parseEmployee(String line) {
-        // Very simple CSV split; your dummy data has no embedded commas
+        // split by comma
         String[] parts = line.split(",");
         if (parts.length < 9) {
             System.out.println("Skipping malformed line: " + line);
-            return null;
+            return null; // skip bad line
         }
 
         String firstName = parts[0].trim();
@@ -140,28 +140,27 @@ public class CA2_Badamtsetseg {
         String email = parts[3].trim();
         double salary;
         try {
-            salary = Double.parseDouble(parts[4].trim());
+            salary = Double.parseDouble(parts[4].trim()); // convert salary
         } catch (NumberFormatException ex) {
-            salary = 0.0;
+            salary = 0.0; // default
         }
         String deptRaw = parts[5].trim();
         String positionRaw = parts[6].trim();
         String jobTitle = parts[7].trim();
         String company = parts[8].trim();
 
-        DepartmentName deptName = DepartmentName.fromString(deptRaw);
+        DepartmentName deptName = DepartmentName.fromString(deptRaw); // get department enum
         Department department = new Department(deptName);
 
-        ManagerType managerType = ManagerType.fromStrings(positionRaw, jobTitle);
+        ManagerType managerType = ManagerType.fromStrings(positionRaw, jobTitle); // guess manager type
 
-        // Manager object not heavily used here, but created to satisfy class structure
-        Manager manager = new Manager(managerType, department);
+        Manager manager = new Manager(managerType, department); // create manager
 
         return new Employee(firstName, lastName, gender, email, salary,
-                department, manager, jobTitle, company);
+                department, manager, jobTitle, company); // return full employee
     }
 
-    // sorting algorithm(merge sort) 
+    // sort list using merge sort 
 
     private static void handleSort() {
         if (employees.isEmpty()) {
@@ -169,52 +168,53 @@ public class CA2_Badamtsetseg {
             return;
         }
 
-        // We use a recursive Merge Sort here.
+        
         // Justification (high level, not algorithm definition):
         // - It has predictable performance on all inputs (no worst-case degradation).
         // - It is naturally recursive, which matches the requirement.
         // - It handles large lists reliably and is stable (keeps equal names in order).
         System.out.println("Sorting employees by full name (alphabetical) using Merge Sort...");
-        mergeSort(employees, NAME_COMPARATOR);
+        mergeSort(employees, NAME_COMPARATOR); // call merge sort
 
         System.out.println("First 30 names (or fewer if list is smaller):");
         for (int i = 0; i < employees.size() && i < 30; i++) {
             Employee e = employees.get(i);
-            System.out.printf("%2d. %s%n", i + 1, e.getFullName());
+            System.out.printf("%2d. %s%n", i + 1, e.getFullName()); // print names
         }
         System.out.println();
     }
-
+    // merge sort wrapper
     private static void mergeSort(List<Employee> list, Comparator<Employee> comparator) {
-        if (list.size() <= 1) {
+        if (list.size() <= 1) { // nothing to sort
             return;
         }
-        Employee[] arr = list.toArray(new Employee[0]);
-        mergeSort(arr, 0, arr.length - 1, comparator);
+        Employee[] arr = list.toArray(new Employee[0]); // convert to array
+        mergeSort(arr, 0, arr.length - 1, comparator); // recursive sort
         list.clear();
-        list.addAll(Arrays.asList(arr));
+        list.addAll(Arrays.asList(arr)); // copy back
     }
-
+      // merge sort recursive method
     private static void mergeSort(Employee[] arr, int left, int right, Comparator<Employee> cmp) {
         if (left >= right) {
-            return;
+            return; // base case
         }
-        int mid = left + (right - left) / 2;
-        mergeSort(arr, left, mid, cmp);
-        mergeSort(arr, mid + 1, right, cmp);
-        merge(arr, left, mid, right, cmp);
+        int mid = left + (right - left) / 2; // middle point
+        mergeSort(arr, left, mid, cmp); // sort left side
+        mergeSort(arr, mid + 1, right, cmp); // sort right side
+        merge(arr, left, mid, right, cmp); // merge both sides
     }
-
+    // merge two halves of array
     private static void merge(Employee[] arr, int left, int mid, int right, Comparator<Employee> cmp) {
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
+        int n1 = mid - left + 1; // left size
+        int n2 = right - mid; // right size
 
         Employee[] L = new Employee[n1];
         Employee[] R = new Employee[n2];
 
-        System.arraycopy(arr, left, L, 0, n1);
-        System.arraycopy(arr, mid + 1, R, 0, n2);
-
+        System.arraycopy(arr, left, L, 0, n1); // copy left
+        System.arraycopy(arr, mid + 1, R, 0, n2); // copy right
+        
+        // merge both arrays
         int i = 0, j = 0;
         int k = left;
 
@@ -224,7 +224,7 @@ public class CA2_Badamtsetseg {
             } else {
                 arr[k++] = R[j++];
             }
-        }
+        } // copy leftovers
         while (i < n1) {
             arr[k++] = L[i++];
         }
@@ -233,7 +233,7 @@ public class CA2_Badamtsetseg {
         }
     }
 
-    // searching employee
+    // search for employee by name
 
     private static void handleSearch() {
         if (employees.isEmpty()) {
@@ -241,8 +241,7 @@ public class CA2_Badamtsetseg {
             return;
         }
 
-        // Ensure list is sorted before binary search
-        mergeSort(employees, NAME_COMPARATOR);
+        mergeSort(employees, NAME_COMPARATOR); // sort before search
 
         System.out.print("Enter full name to search (e.g: John Smith): ");
         String query = SCANNER.nextLine().trim();
@@ -252,7 +251,7 @@ public class CA2_Badamtsetseg {
         // - It is very efficient on sorted lists (logarithmic time).
         // - It greatly reduces the number of comparisons versus a linear scan.
         // - It matches naturally with our sorted structure.
-        int index = binarySearchByFullName(employees, query);
+        int index = binarySearchByFullName(employees, query); // binary search
 
         if (index >= 0) {
             Employee e = employees.get(index);
@@ -271,7 +270,7 @@ public class CA2_Badamtsetseg {
             System.out.println();
         }
     }
-
+    // binary search for name
     private static int binarySearchByFullName(List<Employee> list, String targetName) {
         int left = 0;
         int right = list.size() - 1;
@@ -281,17 +280,17 @@ public class CA2_Badamtsetseg {
             Employee midEmp = list.get(mid);
             int cmp = midEmp.getFullName().compareToIgnoreCase(targetName);
             if (cmp == 0) {
-                return mid;
+                return mid; // found
             } else if (cmp < 0) {
-                left = mid + 1;
+                left = mid + 1; // search right
             } else {
-                right = mid - 1;
+                right = mid - 1; // search left
             }
         }
-        return -1;
+        return -1; // not found
     }
 
-    // add new records 
+    // add new employee records 
 
     private static void handleAddRecord() {
         System.out.println("Add a new employee record.");
@@ -307,7 +306,7 @@ while (true) {
     System.out.println("1. Female");
     System.out.println("2. Male");
     
-
+    // choose gender
     String gInput = SCANNER.nextLine().trim();
 
     if (gInput.equals("1")) {
@@ -326,10 +325,10 @@ while (true) {
 
         double salary = readDoubleWithPrompt("Salary: ");
 
-        DepartmentName deptName = readDepartmentFromUser();
+        DepartmentName deptName = readDepartmentFromUser(); // read department
         Department department = new Department(deptName);
 
-        ManagerType managerType = readManagerTypeFromUser();
+        ManagerType managerType = readManagerTypeFromUser(); // read manager type
         Manager manager = new Manager(managerType, department);
 
         System.out.print("Job Title: ");
@@ -341,11 +340,10 @@ while (true) {
         Employee newEmp = new Employee(firstName, lastName, gender, email, salary,
                 department, manager, jobTitle, company);
 
-        employees.add(newEmp);
-        newlyAddedEmployees.add(newEmp);
+        employees.add(newEmp); // add to list
+        newlyAddedEmployees.add(newEmp); // track new employee
 
-        // After insertion, keep list sorted for consistency
-        mergeSort(employees, NAME_COMPARATOR);
+        mergeSort(employees, NAME_COMPARATOR); // keep list sorted
 
         System.out.println("New employee added successfully.");
         System.out.println("Newly added records this session:");
@@ -354,7 +352,7 @@ while (true) {
         }
         System.out.println();
     }
-
+    // read non-empty input
     private static String readNonEmptyString() {
         while (true) {
             String input = SCANNER.nextLine().trim();
@@ -364,7 +362,7 @@ while (true) {
             System.out.print("Input cannot be empty. Try again: ");
         }
     }
-
+    // read number input
     private static double readDoubleWithPrompt(String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -376,7 +374,7 @@ while (true) {
             }
         }
     }
-
+    // read department choice from user
     private static DepartmentName readDepartmentFromUser() {
         while (true) {
             System.out.println("Choose a Department:");
@@ -415,7 +413,7 @@ while (true) {
         }
     }
 
-    // Binary tree 
+    // create binary tree 
 
     private static void handleCreateBinaryTree() {
         if (employees.size() < 28) {
@@ -428,19 +426,19 @@ while (true) {
         // Build a simple complete binary tree using level-order insertion
         EmployeeBinaryTree tree = new EmployeeBinaryTree();
 
-        // Insert the first 20 employees. You can change this to employees.size() if desired.
+        // Insert the first 28 employees.
         int count = Math.min(28, employees.size());
         System.out.println("Creating employee hierarchy binary tree with " + count + " records...");
         for (int i = 0; i < count; i++) {
-            tree.insert(employees.get(i));
+            tree.insert(employees.get(i)); // insert into tree
         }
 
         System.out.println("Level-order traversal of hierarchy:");
-        tree.printLevelOrder();
+        tree.printLevelOrder(); // print tree
         System.out.println();
 
-        int height = tree.height();
-        int nodeCount = tree.countNodes();
+        int height = tree.height(); // get height
+        int nodeCount = tree.countNodes(); // count nodes
         System.out.println("Tree height     : " + height);
         System.out.println("Total node count: " + nodeCount);
         System.out.println();
@@ -456,8 +454,8 @@ enum MenuOption {
     CREATE_BINARY_TREE(4, "Create a binary tree"),
     EXIT(5, "Exit program");
 
-    private final int code;
-    private final String label;
+    private final int code; // number option
+    private final String label; // text label
 
     MenuOption(int code, String label) {
         this.code = code;
@@ -471,7 +469,7 @@ enum MenuOption {
     public String getLabel() {
         return label;
     }
-
+    // find enum by code
     public static MenuOption fromCode(int code) {
         for (MenuOption option : values()) {
             if (option.code == code) {
@@ -492,6 +490,7 @@ enum DepartmentName {
     ACCOUNTING,
     OTHER;
 
+       // turn string into department name
     public static DepartmentName fromString(String raw) {
         if (raw == null || raw.trim().isEmpty()) {
             return OTHER;
@@ -504,7 +503,7 @@ enum DepartmentName {
         if (s.contains("sale")) return SALES;
         if (s.contains("customer")) return CUSTOMER_SERVICE;
         if (s.contains("account")) return ACCOUNTING;
-        return OTHER;
+        return OTHER; // default
     }
 }
 
@@ -518,12 +517,12 @@ enum ManagerType {
     HEAD_MANAGER,
     ASSISTANT_MANAGER,
     OTHER;
-
+// infer manager type based on position or job title text
     public static ManagerType fromStrings(String position, String jobTitle) {
         String pos = position == null ? "" : position.trim().toLowerCase();
         String title = jobTitle == null ? "" : jobTitle.trim().toLowerCase();
 
-        // First check explicit position field
+        // check explicit position field
         switch (pos) {
             case "intern":
                 return INTERN;
@@ -533,7 +532,7 @@ enum ManagerType {
                 return CONTRACT;
         }
 
-        // Then infer from job title
+        // infer from job title
         if (title.contains("head manager")) return HEAD_MANAGER;
         if (title.contains("senior manager")) return SENIOR_MANAGER;
         if (title.contains("team lead")) return TEAM_LEADER;
@@ -660,20 +659,20 @@ class Employee {
 
 class EmployeeBinaryTree {
     private static class Node {
-        Employee data;
-        Node left;
-        Node right;
+        Employee data; // store employee
+        Node left; // left child
+        Node right; // right child
 
         Node(Employee data) {
             this.data = data;
         }
     }
 
-    private Node root;
-
+    private Node root; // root node
+    // insert into tree (level-order)
     public void insert(Employee employee) {
         Node newNode = new Node(employee);
-        if (root == null) {
+        if (root == null) { // empty tree
             root = newNode;
             return;
         }
@@ -696,7 +695,7 @@ class EmployeeBinaryTree {
             }
         }
     }
-
+    // print tree level by level
     public void printLevelOrder() {
         if (root == null) {
             System.out.println("(empty tree)");
@@ -721,16 +720,16 @@ class EmployeeBinaryTree {
             level++;
         }
     }
-
+    // count all nodes
     public int countNodes() {
         return countNodes(root);
     }
 
     private int countNodes(Node node) {
         if (node == null) return 0;
-        return 1 + countNodes(node.left) + countNodes(node.right);
+        return 1 + countNodes(node.left) + countNodes(node.right); // recursive count
     }
-
+    // get height of tree
     public int height() {
         return height(root);
     }
@@ -739,6 +738,6 @@ class EmployeeBinaryTree {
         if (node == null) return 0;
         int lh = height(node.left);
         int rh = height(node.right);
-        return 1 + Math.max(lh, rh);
+        return 1 + Math.max(lh, rh);  // height = 1 + max child height
     }
 }
